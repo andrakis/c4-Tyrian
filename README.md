@@ -1,102 +1,120 @@
-# OpenTyrian
+# src/opentyrian — Tyrian on C4IX, C4DOS and the bare machine
 
-<img src="linux/icons/tyrian-128.png" width="128" height="128" align="right" alt="OpenTyrian icon">
+Tyrian (Eclipse Software, 1995), the vertical shooter, as OpenTyrian has
+it. It is compiled by c4lc and played on libjs's whole display, with its
+music on libjs's sound card AdLib and its sound effects on the card's
+sample channels. It is played from the keyboard; the mouse works in the
+menus.
 
-OpenTyrian is an open-source port of the DOS game Tyrian.
+The game's data is not here. Tyrian 2.1 is freeware, but its `license.doc`
+does not allow it to be passed on. `data/README.md` says where to put
+the zip so the build puts the game on the disks; without it the game is
+built but says so when it starts.
 
-Tyrian is an arcade-style vertical scrolling shooter.  The story is set
-in 20,031 where you play as Trent Hawkins, a skilled fighter-pilot employed
-to fight MicroSol and save the galaxy.
+[docs/ports-feasibility.md](../../docs/ports-feasibility.md) (§5) says
+what c4lc needed for it. Doom ([src/doom](../doom/README.md)) was the
+port before it, and this one follows it.
 
-Tyrian features a story mode, one- and two-player arcade modes, and networked
-multiplayer.
+## Where it runs
 
-## Downloads
-
-Download the appropriate build for your platform from the
-[latest release](https://github.com/opentyrian/opentyrian/releases/latest),
-extract it, and run it:
-
-| Platform | File | Run |
+| where | how | platform |
 |---|---|---|
-| Windows | `opentyrian-<version>-windows-<arch>.zip` | Unzip and run `opentyrian.exe` |
-| macOS | `opentyrian-<version>-macos-universal.zip` | Unzip and open `OpenTyrian.app` |
-| Linux | `opentyrian-<version>-linux-<arch>.tar.gz` | Extract and run `./opentyrian` |
+| C4IX, the whole display | `tyrian`, or Go > Tyrian; the desktop gives way until it ends (`include/display.h`) | `video-c4.c`, `tyr-c4ix.c` |
+| C4DOS | `TYRIAN` at the `A>` prompt; the page's `?system=c4dos` | `video-c4.c`, `tyr-bare.c` |
+| the bare machine | `tyrian.c4r` as the machine's image; the page's `?system=tyrian` | `video-c4.c`, `tyr-bare.c` |
 
-These builds contain everything needed to run the game, including the freeware
-Tyrian 2.1 data files.
+On C4IX the game is `/usr/games/tyrian/tyrian.c4r`, with its data in
+`data/` next to it. The data stays on the host until something opens it:
+that directory is a `hostdir()` in `c4ix.vfs.txt`, which takes whatever
+files the disk's `tyrian/` has (`vfsload.c`). On the bare machine and
+under C4DOS the data is in `tyrian/data` on the games' disk
+(`src/c4bb/images/games`). In both cases the place comes from
+`tyr_base()`, as a self-contained OpenTyrian's would. `-t DIR` overrides
+it.
 
-The macOS app is not notarized.  If Gatekeeper refuses to open it, right-click
-the app, choose *Open*, and confirm once.
+## Where it comes from
 
-## Configuration
+- **The game:** [OpenTyrian](https://github.com/opentyrian/opentyrian),
+  commit `ac5d0e7`, under the GNU GPL v2 or later (`COPYING`).
+  `README.opentyrian.md` is its own README. Its units and headers are
+  here, without its build files and platform directories.
+- **The data:** Tyrian 2.1, `tyrian21.zip`, from the user's own copy
+  (`data/README.md`). `tools/tyrdata.py` takes the files the game reads
+  from it: the levels, shapes, sounds, music, palettes, pictures and
+  demos. It leaves the DOS programs, the documents and the network and
+  setup files behind.
 
-Configuration and saved game files are kept in one of the following locations:
+## What is here
 
-| Platform | Location |
+| file | what |
 |---|---|
-| Windows | `%APPDATA%\OpenTyrian` |
-| macOS / Linux | `$XDG_CONFIG_HOME/opentyrian` or `~/.config/opentyrian` |
+| OpenTyrian's units and headers | the game, with the changes below |
+| `c4sdl.c`, `c4/SDL.h` | the slice of SDL 2 the game calls, over libjs's display, clock and input |
+| `video-c4.c` | in place of `video.c` and `video_scale*.c`: the 320x200 8-bit screen and its palette sent as `GUI_BLIT8`, which the host scales to 640x480 (2.4x down, the 4:3 a VGA monitor showed) |
+| `loudness-c4.c` | in place of `loudness.c` and `opl.c`: the music player, `lds_play.c`, writes the card's own OPL, its updates stamped with the card's stream time at Tyrian's 69.5 a second; sound effects go on the sample channels as 8-bit |
+| `tyrian-sum.c` | what every platform shares: `--timedemo N`, each frame shown checksummed with its palette, on a virtual clock |
+| `tyr-c4ix.c`, `tyr-bare.c` | whether the display has to be asked for (on C4IX the desktop has it), and where the data is |
+| `tyr-host.c` | the platform on a host, built with gcc: no display and no sound, the reference for `make test-tyrian` |
+| `c4/` | `SDL.h` and friends, and the `stdint.h`, `stdbool.h` and `inttypes.h` C4IX's libc lacks |
+| `tools/tyrdata.py` | the data out of the zip, for `build-images.sh` |
+| `data/` | where the zip goes; ignored by git but for its README |
 
-On Windows and Linux, if `opentyrian.cfg` exists in the same directory as the
-executable, the configuration and saved game files will be stored there instead.
+## The changes to OpenTyrian
 
-## Game Data
+Each is under `#ifdef C4TYR`. Everything else is OpenTyrian's own code,
+and the units it replaces are not built.
 
-If you download a release build of OpenTyrian, the freeware Tyrian 2.1 data
-files are included and do not need to be downloaded separately.
+- **`--timedemo N`** plays demo N from the title screen at once and exits
+  when it ends (`opentyr.c`, `tyrian2.c`, `demo.c`).
+- **The OPL** is the sound card's, not OpenTyrian's emulator (`opl.h`).
+- **Speed.** `Swar8`, the type OpenTyrian's blitters work eight pixels
+  at a time in, is the 32-bit word (`swar.h`). c4lc's `#if` arithmetic
+  is a word wide, so upstream's `UINTPTR_MAX >= UINT64_MAX` test cannot
+  tell 32 bits from 64. A 64-bit `Swar8` is two words, and every
+  operation on it is a helper call: the background blitters and the
+  starfield took 94% of the time. With the change the game runs twelve
+  times as fast. gcc `-m32` makes the same choice.
 
-Otherwise, download [Tyrian v2.1](https://camanis.net/tyrian/tyrian21.zip) and
-extract the archive so that the files (with lowercase filenames) are in one of
-the following locations, searched in order:
+c4lc needed M12 for it ([docs/c4lc-design.md](../../docs/c4lc-design.md)
+14.11). That covers declarations in `for`, structs returned by value,
+compound literals, `&A` of an array typedef, and scalar initializers that
+convert between integer and floating types. Before the last of those,
+`int t = c * r;` stored the float's bits. OpenTyrian's
+`JE_gammaCorrect_func` is that line, and the game's palette went white.
 
-1. the directory given with `--data=DIR`
-2. a `data` directory next to the executable (inside `Contents/Resources`
-   for the macOS app)
-3. the system directory the build was configured with
-   (`/usr/local/share/games/tyrian` by default; `C:\TYRIAN` on Windows)
-4. the current directory
+## Building and testing
 
-## Building
+- `make tyrian-objs` compiles each unit with c4lc into `.tyrian/`, and
+  the two platform choices into `.tyrian/plat/`. `build-images.sh` links
+  them two ways:
+  - against C4IX's libc, as `/usr/games/tyrian/tyrian.c4r`;
+  - whole with the bare libc (`make wolf3d-bare-objs`), as
+    `images/games/tyrian.c4r`.
 
-Requirements: a C99 compiler, GNU make, pkg-config, SDL2, and, for network
-play, SDL2_net.
+  Where the zip is, it also unpacks the data onto both disks.
+- `make tyrian-host` is the gcc build, 32-bit as the c4lc build is.
+- `make test-tyrian` plays demo 4 with `--timedemo 4 -s -x -j` four ways:
+  the gcc build, then c4lc's on the bare machine, under C4DOS and inside
+  C4IX. All four must print the same frames. Without the data it says it
+  was skipped.
+  - `-s`: no sound, because the gcc build has none, so both run the same
+    code.
+  - `-x`: not the Christmas edition, which the date would choose in
+    December.
+  - `-j`: no joystick.
 
-    make
+  These checksums are for the zip of `data/README.md`:
 
-Network play is enabled automatically when SDL2_net is found.
+  ```
+  timedemo: demo 1: 6051 frames, checksum 89ee7639
+  timedemo: demo 2: 5120 frames, checksum 5860cfb7
+  timedemo: demo 3: 2316 frames, checksum 5e5f6bb1
+  timedemo: demo 4: 1856 frames, checksum 389b26f7
+  timedemo: demo 5: 3105 frames, checksum 932401e1
+  ```
 
-A Visual Studio solution is provided in `visualc/`.
-
-## Command-Line Options
-
-    -h, --help                   Show help about options
-    -s, --no-sound               Disable audio
-    -j, --no-joystick            Disable joystick/gamepad input
-    -x, --no-xmas                Disable Christmas mode
-    -t, --data=DIR               Set Tyrian data directory
-    -n, --net=HOST[:PORT]        Start a networked game
-    --net-player-name=NAME       Set local player name in a networked game
-    --net-player-number=NUMBER   Set local player number in a networked game
-                                 (1 or 2)
-    -p, --net-port=PORT          Set local port to bind (default is 1333)
-    -d, --net-delay=FRAMES       Set lag-compensation delay (default is 1)
-
-## Network Multiplayer
-
-Currently OpenTyrian does not have an arena; as such, networked games must be
-initiated manually via the command line simultaneously by both players.
-
-    opentyrian --net HOSTNAME --net-player-name NAME --net-player-number NUMBER
-
-where `HOSTNAME` is the IP address of your opponent, `NUMBER` is either 1 or 2
-depending on which ship you intend to pilot, and `NAME` is your alias.
-
-OpenTyrian uses UDP port 1333 for multiplayer, but in most cases players will
-not need to open any ports because OpenTyrian makes use of UDP hole punching.
-
-## Links
-
-- project: <https://github.com/opentyrian/opentyrian>
-- irc:     <ircs://irc.oftc.net/#opentyrian>
-- forums:  <https://tyrian2k.proboards.com/board/5>
+  The game times itself by the clock, so while timing the clock is
+  virtual: each reading is a millisecond later, and a delay adds its wait
+  (`tyrian-sum.c`). `--trace` prints each frame's checksum as it goes, and
+  `--rows N` prints frame N row by row with its palette. Comparing those
+  with the gcc build's is how a difference is found.

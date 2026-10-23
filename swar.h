@@ -23,7 +23,13 @@
 #include <string.h>
 
  // Unsigned integer type with 1x, 2x, 4x, or 8x 8-bit lanes.
-#if UINTPTR_MAX >= UINT64_MAX
+#if defined(C4TYR)
+// c4 (README.md): the machine's word, 32 bits, as gcc -m32 chooses. c4lc's
+// #if arithmetic is a word wide, so the tests below cannot tell 32 bits
+// from 64, and a 64-bit Swar8 is two words whose every operation is a call.
+#define Swar8 uint32_t
+#define SWAR8_LANES 4
+#elif UINTPTR_MAX >= UINT64_MAX
 #define Swar8 uint64_t
 #define SWAR8_LANES 8
 #elif UINTPTR_MAX >= UINT32_MAX

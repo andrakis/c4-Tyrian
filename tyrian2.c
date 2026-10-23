@@ -3301,6 +3301,18 @@ bool titleScreen(void)
 
 		while (true)
 		{
+#ifdef C4TYR
+			// c4tyr: a timedemo plays its demo at once, and ends when it
+			// is back here (tyrian-sum.c)
+			{
+				int tyr_title(void);
+				if (tyr_title())
+				{
+					playDemo = true;
+					return true;
+				}
+			}
+#endif
 			// Play demo after idle for 30 seconds.
 			if (SDL_GetTicks() - idleStartTick > 30000)
 			{

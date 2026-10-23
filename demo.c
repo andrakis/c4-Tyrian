@@ -45,6 +45,14 @@ void beginPlayDemo(void)
 {
 	assert(demoFile.f == NULL);
 
+#ifdef C4TYR
+	// c4tyr: a timedemo's demo (tyrian-sum.c)
+	{
+		int tyr_timedemo(void);
+		if (tyr_timedemo())
+			demoNum = tyr_timedemo() - 1;
+	}
+#endif
 	if (++demoNum > 5)
 		demoNum = 1;
 

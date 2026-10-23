@@ -1,36 +1,4 @@
-/data/
-
-newsh$.shp
-opentyrian.cfg
-tyrian.cfg
-tyrian.sav
-
-# Text editor detritus
-*~
-*.swp
-
-# Make build output
-/obj/
-/src/*.gch
-/opentyrian
-
-# Windows build output
-/opentyrian.exe
-/SDL2.dll
-/SDL2_net.dll
-
-# MSVC build output and project
-/opentyrian-*.exe
-/opentyrian-*.ilk
-/opentyrian-*.pdb
-/opentyrian-*.iobj
-/opentyrian-*.ipdb
-/visualc/.vs/
-/visualc/*.props
-/visualc/*.user
-
-# Doxygen output
-/doc/doxygen/
-
-# Release build scripts output (make_macos.sh, make_linux.sh)
-/build/
+# Tyrian 2.1 data: not to be committed (README.md)
+*
+!.gitignore
+!README.md

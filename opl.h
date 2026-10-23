@@ -46,8 +46,17 @@ void adlib_getsample(Bit16s* sndptr, Bits numsamples);
 Bitu adlib_reg_read(Bitu port);
 void adlib_write_index(Bitu port, Bit8u val);
 
+#ifdef C4TYR
+// c4tyr: libjs's sound card is the OPL (loudness-c4.c), and opl.c's
+// emulator is not built
+void tyr_opl_init(void);
+void tyr_opl_write(int reg, int val);
+#define opl_init() tyr_opl_init()
+#define opl_write(reg, val) tyr_opl_write(reg, val)
+#else
 #define opl_init() adlib_init(audioSampleRate)
 #define opl_write(reg, val) adlib_write(reg, val)
 #define opl_update(buf, num) adlib_getsample(buf, num)
+#endif
 
 #endif /* OPL_H */

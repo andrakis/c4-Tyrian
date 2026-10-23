@@ -748,8 +748,16 @@ void setupMenu(void)
 	}
 }
 
+#ifdef C4TYR
+void tyr_start(int *argc, char **argv);
+#endif
+
 int main(int argc, char *argv[])
 {
+#ifdef C4TYR
+	// c4tyr: --timedemo N, before the game's own options (tyrian-sum.c)
+	tyr_start(&argc, argv);
+#endif
 #ifndef NDEBUG
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 #endif
