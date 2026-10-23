@@ -20,6 +20,7 @@ port before it, and this one follows it.
 | where | how | platform |
 |---|---|---|
 | C4IX, the whole display | `tyrian`, or Go > Tyrian; the desktop gives way until it ends (`include/display.h`) | `video-c4.c`, `tyr-c4ix.c` |
+| C4IX, a window | `tyrian --window` in a Terminal, whose window it plays in; also when a program that does not give way has the display. With `pin`, on a CPU of its own (docs/c4ix-smp.md) | `video-c4.c`, `tyr-c4ix.c` |
 | C4DOS | `TYRIAN` at the `A>` prompt; the page's `?system=c4dos` | `video-c4.c`, `tyr-bare.c` |
 | the bare machine | `tyrian.c4r` as the machine's image; the page's `?system=tyrian` | `video-c4.c`, `tyr-bare.c` |
 

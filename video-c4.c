@@ -6,7 +6,9 @@
 // showed. There is one scaler, the host's, and no window to resize.
 //
 // On C4IX the desktop has the display, and gives it way until the game
-// ends (tyr-c4ix.c); on the bare machine and C4DOS it is the game's
+// ends (tyr-c4ix.c) -- or, with --window or when a program that does not
+// give way has it, the game plays in the Terminal window it was started
+// from; on the bare machine and C4DOS it is the game's
 // (tyr-bare.c); the host's build has none (tyr-host.c). A timedemo runs
 // without it (tyrian-sum.c). This is the unit that carries gui.h's
 // functions; the others take its declarations only.
@@ -25,6 +27,11 @@
 int  tyr_open_display(void);    // tyr-*.c: the display is there and ours
 void tyr_close_display(void);
 int  tyr_headless(void);        // tyrian-sum.c: a timedemo
+int  tyr_windowed(void);        //   and --window
+int  tyr_win_open(void);        // tyr-*.c: a window instead (C4IX's)
+void tyr_win_draw(Uint8 *pixels, int pitch, Uint32 *palette);
+int  tyr_win_poll(int *ev);
+void tyr_win_close(void);
 
 enum { W = 640, H = 480, RING = 65536 };
 
@@ -55,10 +62,23 @@ const uint scalers_count = 1;
 void set_scaler_by_name(const char *name) { (void) name; }
 
 static int on;
+static int win;
 static int *ring;
 
-// the display's next event, for c4sdl.c's queue
-int tyr_poll(int *ev) { return on && gui_poll(ev); }
+// the display's next event, for c4sdl.c's queue; or the window's, in the
+// display's form
+int tyr_poll(int *ev) {
+	if (win) return tyr_win_poll(ev);
+	return on && gui_poll(ev);
+}
+
+static void close_win(void) { if (win) tyr_win_close(); win = 0; }
+static int open_win(void) {
+	if (!tyr_win_open()) return 0;
+	win = 1;
+	atexit(close_win);
+	return 1;
+}
 
 static void close_display(void) {
 	if (!on) return;
@@ -80,7 +100,12 @@ void init_video(void)
 	JE_clr256(VGAScreen);
 
 	if (tyr_headless()) return;
-	if (!tyr_open_display()) { printf("opentyrian: no display to draw on\n"); return; }
+	if (tyr_windowed() && open_win()) return;
+	if (!tyr_open_display()) {
+		if (open_win()) { printf("opentyrian: a program has the display; playing in the window\n"); return; }
+		printf("opentyrian: no display to draw on\n");
+		return;
+	}
 	if (!(ring = malloc(RING)) || !gui_attach(ring, RING, W, H)) { tyr_close_display(); return; }
 	gui_events(GUI_M_KEYS | GUI_M_MOVE | GUI_M_BUTTONS | GUI_M_WINDOW);
 	gui_cursor(GUI_PTR_NONE);           // the game draws its own pointer
@@ -127,6 +152,7 @@ void tyr_frame(SDL_Surface *s);
 void JE_showVGA(void)
 {
 	tyr_frame(VGAScreen);
+	if (win) { tyr_win_draw((Uint8 *) VGAScreen->pixels, VGAScreen->pitch, rgb_palette); return; }
 	if (!on) return;
 	gui_blit8(0, 0, vga_width, vga_height, (char *) VGAScreen->pixels, VGAScreen->pitch,
 	          (int *) rgb_palette, W, H);

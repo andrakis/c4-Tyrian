@@ -10,6 +10,11 @@
 
 int tyr_open_display(void) { return gui_present(); }
 void tyr_close_display(void) {}
+// no window to play in instead of the display
+int tyr_win_open(void) { return 0; }
+void tyr_win_draw(uint8_t *pixels, int pitch, uint32_t *palette) { (void) pixels; (void) pitch; (void) palette; }
+int tyr_win_poll(int *ev) { (void) ev; return 0; }
+void tyr_win_close(void) {}
 // the games' disk has the data in tyrian/data (build-images.sh)
 const char *tyr_base(void) { return "tyrian/"; }
 int tyr_has_sound(void) { return snd_present(); }

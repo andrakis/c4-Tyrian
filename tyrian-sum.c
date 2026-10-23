@@ -20,6 +20,7 @@ Uint32 plat_ms(void);           // tyr-c4ix.c, tyr-bare.c, tyr-host.c
 void   plat_sleep(Uint32 ms);
 
 static int timing;
+static int windowing;            // --window: in the Terminal's window (tyr-c4ix.c)
 static int tracing;              // --trace: each frame's checksum as it goes
 static int rowsframe;            // --rows N: and frame N row by row
 static int demo;
@@ -35,6 +36,13 @@ static void report(void) {
 // main's first act: --timedemo N taken off the command line
 void tyr_start(int *argc, char **argv) {
 	int i, j;
+	for (i = 1; i < *argc; i++) {
+		if (strcmp(argv[i], "--window") != 0) continue;
+		windowing = 1;
+		for (j = i; j + 1 <= *argc; j++) argv[j] = argv[j + 1];
+		*argc = *argc - 1;
+		break;
+	}
 	for (i = 1; i < *argc; i++) {
 		if (strcmp(argv[i], "--trace") != 0) continue;
 		tracing = 1;
@@ -62,6 +70,7 @@ void tyr_start(int *argc, char **argv) {
 }
 
 int tyr_headless(void) { return timing; }
+int tyr_windowed(void) { return windowing; }
 int tyr_timedemo(void) { return demo; }
 
 // the title screen, waiting: the first time it starts the demo, the second

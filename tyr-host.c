@@ -8,6 +8,10 @@
 
 int tyr_open_display(void) { return 0; }
 void tyr_close_display(void) {}
+int tyr_win_open(void) { return 0; }
+void tyr_win_draw(uint8_t *pixels, int pitch, uint32_t *palette) { (void) pixels; (void) pitch; (void) palette; }
+int tyr_win_poll(int *ev) { (void) ev; return 0; }
+void tyr_win_close(void) {}
 // the data where it runs, or where -t says
 const char *tyr_base(void) { return "./"; }
 int tyr_has_sound(void) { return 0; }
