@@ -107,8 +107,11 @@ void init_video(void)
 		return;
 	}
 	if (!(ring = malloc(RING)) || !gui_attach(ring, RING, W, H)) { tyr_close_display(); return; }
-	gui_events(GUI_M_KEYS | GUI_M_MOVE | GUI_M_BUTTONS | GUI_M_WINDOW);
-	gui_cursor(GUI_PTR_NONE);           // the game draws its own pointer
+	gui_events(GUI_M_KEYS | GUI_M_MOVE | GUI_M_BUTTONS | GUI_M_WINDOW | GUI_M_REL);
+	// the game draws its own pointer, and the mouse steers the ship: locked
+	// to the display from a click on it (Esc lets it go), so it cannot
+	// wander off it
+	gui_cursor(GUI_PTR_LOCK);
 	gui_clear(0x000000);
 	gui_show();
 	on = 1;

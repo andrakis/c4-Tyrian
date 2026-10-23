@@ -262,6 +262,19 @@ static void gather(void) {
 			e.motion.state = mbuttons;
 			mx = ev[1]; my = ev[2];
 			push(&e);
+		} else if (ev[0] == GUI_EV_REL) {
+			// the mouse locked to the display: its motion, which the
+			// display's edge does not stop, and a pointer kept inside it
+			e.type = SDL_MOUSEMOTION;
+			mx += ev[1]; my += ev[2];
+			if (mx < 0) mx = 0;
+			if (mx > 639) mx = 639;
+			if (my < 0) my = 0;
+			if (my > 479) my = 479;
+			e.motion.x = mx; e.motion.y = my;
+			e.motion.xrel = ev[1]; e.motion.yrel = ev[2];
+			e.motion.state = mbuttons;
+			push(&e);
 		} else if (ev[0] == GUI_EV_DOWN || ev[0] == GUI_EV_UP) {
 			e.type = ev[0] == GUI_EV_DOWN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
 			e.button.button = ev[3] == 2 ? SDL_BUTTON_RIGHT : ev[3] == 1 ? SDL_BUTTON_MIDDLE : SDL_BUTTON_LEFT;
