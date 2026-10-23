@@ -13,7 +13,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+// a game asks to be served sooner and longer than the rest (nice, sched.c)
+int unice(int id, int nice);            // libc4ix (c4ix_user.h)
+enum { TYR_NICE = -5 };
+
 int tyr_open_display(void) {
+	unice(0, TYR_NICE);
 	if (!gui_present()) return 0;
 	return udisplay_take(0);
 }
@@ -29,6 +34,7 @@ static int sent, waiting, pending, closed;
 
 int tyr_win_open(void) {
 	int i;
+	unice(0, TYR_NICE);
 	for (i = 0; i < 2; i++) {
 		fbuf[i] = (char *) calloc(320 * 200, 1);
 		fpal[i] = (int *) calloc(256, sizeof(int));

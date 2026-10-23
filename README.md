@@ -24,7 +24,9 @@ port before it, and this one follows it.
 | C4DOS | `TYRIAN` at the `A>` prompt; the page's `?system=c4dos` | `video-c4.c`, `tyr-bare.c` |
 | the bare machine | `tyrian.c4r` as the machine's image; the page's `?system=tyrian` | `video-c4.c`, `tyr-bare.c` |
 
-On C4IX the game is `/usr/games/tyrian/tyrian.c4r`, with its data in
+On C4IX the game asks for a nice of -5 (docs/c4ix-design.md 4.4), so it
+is served sooner and longer than the programs beside it. It is
+`/usr/games/tyrian/tyrian.c4r`, with its data in
 `data/` next to it. The data stays on the host until something opens it:
 that directory is a `hostdir()` in `c4ix.vfs.txt`, which takes whatever
 files the disk's `tyrian/` has (`vfsload.c`). On the bare machine and
