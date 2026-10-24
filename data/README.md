@@ -7,7 +7,7 @@ committed here. This directory ignores everything but this file.
 
 To play it on c4, put the zip, as distributed, here:
 
-    src/opentyrian/data/tyrian21.zip
+    data/tyrian21.zip
 
 You can also point at it from anywhere with `TYRIAN_ZIP=/path/to/tyrian21.zip`.
 Then run `make c4bb-images`. `build-images.sh` unpacks the files the

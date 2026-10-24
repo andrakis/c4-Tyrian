@@ -3,7 +3,7 @@
 # zip (tyrian21.zip, as distributed: everything in a tyrian21/ folder)
 # into DEST, flat. The DOS programs, their documents and the network and
 # setup files are left in the zip. build-images.sh runs it only where the
-# zip is (src/opentyrian/data/README.md): Tyrian's licence does not let
+# zip is (data/README.md): Tyrian's licence does not let
 # it be passed on, so nothing here is in the repository.
 import os, sys, zipfile
 

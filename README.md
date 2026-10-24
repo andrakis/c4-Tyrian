@@ -1,4 +1,4 @@
-# src/opentyrian — Tyrian on C4IX, C4DOS and the bare machine
+# games/tyrian — Tyrian on C4IX, C4DOS and the bare machine
 
 Tyrian (Eclipse Software, 1995), the vertical shooter, as OpenTyrian has
 it. It is compiled by c4lc and played on libjs's whole display, with its
@@ -12,7 +12,7 @@ the zip so the build puts the game on the disks; without it the game is
 built but says so when it starts.
 
 [docs/ports-feasibility.md](../../docs/ports-feasibility.md) (§5) says
-what c4lc needed for it. Doom ([src/doom](../doom/README.md)) was the
+what c4lc needed for it. Doom ([games/doom](../doom/README.md)) was the
 port before it, and this one follows it.
 
 ## Where it runs

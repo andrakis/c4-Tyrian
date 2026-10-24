@@ -1,0 +1,7 @@
+# OpenTyrian (games/tyrian): the game, and Tyrian 2.1's
+# data -- which may not be passed on, so it is on the disk
+# only where build-images.sh found it to copy: whatever is
+# in the disk's tyrian/, lazy (hostdir, vfsload.c)
+tyrian/:
+	tyrian.c4r: c4ix-tyrian.c4r
+	data/: hostdir(tyrian/)
