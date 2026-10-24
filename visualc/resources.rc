@@ -1,5 +1,0 @@
-#include <windows.h>
-
-1 ICON "tyrian.ico"
-
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "opentyrian.manifest"
