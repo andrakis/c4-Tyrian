@@ -116,6 +116,18 @@ convert between integer and floating types. Before the last of those,
   timedemo: demo 5: 3105 frames, checksum 932401e1
   ```
 
+  To compare how fast the game runs between machines, add `--show`: the
+  frames go to the display (or to the window, with `--window`) as well, so the
+  time counts the drawing. Every timedemo prints a speed line before its
+  checksum, by the machine's real clock from the first frame:
+
+  ```
+  speed: demo 4: 1856 frames in 14.205 s, 152.9 fps
+  ```
+
+  In the page that clock is the wall's. Under `cli.js`, unpaced, it is
+  cycles over the MHz asked for, so there time the run from outside.
+
   The game times itself by the clock, so while timing the clock is
   virtual: each reading is a millisecond later, and a delay adds its wait
   (`tyrian-sum.c`). `--trace` prints each frame's checksum as it goes, and
