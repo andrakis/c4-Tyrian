@@ -22,6 +22,7 @@ port before it, and this one follows it.
 | C4IX, the whole display | `tyrian`, or Go > Tyrian; the desktop gives way until it ends (`include/display.h`) | `video-c4.c`, `tyr-c4ix.c` |
 | C4IX, a window | `tyrian --window` in a Terminal, whose window it plays in; also when a program that does not give way has the display. With `pin`, on a CPU of its own (docs/c4ix-smp.md) | `video-c4.c`, `tyr-c4ix.c` |
 | C4DOS | `TYRIAN` at the `A>` prompt; the page's `?system=c4dos` | `video-c4.c`, `tyr-bare.c` |
+| a grin window, under C4DOS | Program Manager's Games > Tyrian, or `TYRIAN.C4R` in File Manager or a DOS Prompt, in grin (`?system=c4dos` boots into it) | `video-c4.c`, `tyr-bare.c`, through grin's table (below) |
 | the bare machine | `tyrian.c4r` as the machine's image; the page's `?system=tyrian` | `video-c4.c`, `tyr-bare.c` |
 
 On C4IX the game asks for a nice of -5 (docs/c4ix-design.md 4.4), so it
@@ -34,6 +35,22 @@ under C4DOS the data is in `tyrian/data` on the games' disk
 (`src/c4bb/images/games`). In both cases the place comes from
 `tyr_base()`, as a self-contained OpenTyrian's would. `-t DIR` overrides
 it.
+
+Under grin, C4DOS's Windows 3.1-style shell (c4's `docs/grin-plan.md`,
+3.6), the display is grin's, and grin publishes a table in C4DOS's slot
+25 while it has it. The bare platform layer looks there first: finding
+grin, it never takes the display (no `gui_attach`), and plays in a window
+of grin's instead, through the table's `fwin_open`, `fwin_frame` and
+`fwin_poll` -- the C4IX window's three calls, pointed at grin. Each poll
+runs grin's loop once, so grin's applications (a Clock, Notepad) carry on
+while the game plays; the window is 1x (320x200) or 2x (640x400), from its
+Size menu; keys reach the game only while its window has the focus; and
+closing the window ends the game, as quitting it would. Without grin -- at
+`A>`, full screen from grin, or on the bare machine -- nothing changes.
+
+In grin's window the mouse steers too: a click on the window locks it to
+the display, as full screen, Esc lets it go, and its motion and buttons
+come to `c4sdl.c` in the display's 640x480, as they do full screen.
 
 ## Where it comes from
 
@@ -56,7 +73,7 @@ it.
 | `video-c4.c` | in place of `video.c` and `video_scale*.c`: the 320x200 8-bit screen and its palette sent as `GUI_BLIT8`, which the host scales to 640x480 (2.4x down, the 4:3 a VGA monitor showed) |
 | `loudness-c4.c` | in place of `loudness.c` and `opl.c`: the music player, `lds_play.c`, writes the card's own OPL, its updates stamped with the card's stream time at Tyrian's 69.5 a second; sound effects go on the sample channels as 8-bit |
 | `tyrian-sum.c` | what every platform shares: `--timedemo N`, each frame shown checksummed with its palette, on a virtual clock |
-| `tyr-c4ix.c`, `tyr-bare.c` | whether the display has to be asked for (on C4IX the desktop has it), and where the data is |
+| `tyr-c4ix.c`, `tyr-bare.c` | whether the display has to be asked for (on C4IX the desktop has it, under grin grin does), the window instead (C4IX's, or grin's), and where the data is |
 | `tyr-host.c` | the platform on a host, built with gcc: no display and no sound, the reference for `make test-tyrian` |
 | `c4/` | `SDL.h` and friends, and the `stdint.h`, `stdbool.h` and `inttypes.h` C4IX's libc lacks |
 | `tools/tyrdata.py` | the data out of the zip, for `build-images.sh` |
