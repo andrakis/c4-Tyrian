@@ -61,7 +61,7 @@ test-tyrian: tyrian-host c4bb-images
 	   2>/dev/null > .tyr_t/c4ix.out && \
 	 for w in bare dos c4ix; do grep '^timedemo' .tyr_t/$$w.out | cmp -s .tyr_t/host.txt - \
 	   || { echo "test-tyrian: $$w's frames differ:"; tail -5 .tyr_t/$$w.out; exit 1; }; done && \
-	 { grep -A1 '^timedemo' .tyr_t/dos.out | grep -q '^A>C4DOS version' \
+	 { grep -A1 '^timedemo' .tyr_t/dos.out | grep -Eq '^A(:\\)?>C4DOS version' \
 	   || { echo "test-tyrian: C4DOS did not come back to its prompt:"; tail -5 .tyr_t/dos.out; exit 1; }; } && \
 	 rm -rf .tyr_t && echo "test-tyrian: OK"
 PHONY += test-tyrian
