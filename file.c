@@ -201,6 +201,22 @@ static void determineUserDirPath(void)
 			return;
 	}
 
+#ifdef C4TYR
+	// c4tyr: the place the platform has for settings and saves, if it
+	// has one (tyr-c4ix.c: the game's own directory)
+	{
+		const char *tyr_user_dir(void);
+		const char *dir = tyr_user_dir();
+		if (dir != NULL)
+		{
+			userDirPathLen = strlen(dir);
+			userDirPath = malloc(userDirPathLen + 1);
+			strcpy(userDirPath, dir);
+			return;
+		}
+	}
+#endif
+
 #ifdef TARGET_WIN32
 	const char *appData = getenv("APPDATA");
 	if (appData != NULL)

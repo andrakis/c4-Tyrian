@@ -35,6 +35,9 @@ under C4DOS the data is in `tyrian/data` on the games' disk
 (`src/c4bb/images/games`). In both cases the place comes from
 `tyr_base()`, as a self-contained OpenTyrian's would. `-t DIR` overrides
 it.
+On C4IX its settings and saved games go beside it in
+`/usr/games/tyrian`, as the other games keep theirs, whatever directory
+it was started from (`tyr_user_dir()`, `file.c`); elsewhere where it runs.
 
 Under grin, C4DOS's Windows 3.1-style shell (c4's `docs/grin-plan.md`,
 3.6), the display is grin's, and grin publishes a table in C4DOS's slot

@@ -79,8 +79,11 @@ int tyr_win_poll(int *ev) {
 }
 void tyr_win_close(void) { if (!closed) { win_close(); closed = 1; } }
 
-// the game in /usr/games/tyrian, its data in data/ there (c4ix.vfs.txt)
+// the game in /usr/games/tyrian, its data in data/ there (c4ix.vfs.txt),
+// and its settings and saves beside it, as the other games keep theirs,
+// not in the directory it was started from (file.c)
 const char *tyr_base(void) { return "/usr/games/tyrian/"; }
+const char *tyr_user_dir(void) { return "/usr/games/tyrian"; }
 int tyr_has_sound(void) { return snd_present(); }
 uint32_t plat_ms(void) { return __time(); }
 void plat_sleep(uint32_t ms) { if (ms) __c4_usleep(ms * 1000); }

@@ -58,6 +58,8 @@ int tyr_win_poll(int *ev) {
 void tyr_win_close(void) {}
 // the games' disk has the data in tyrian/data (build-images.sh)
 const char *tyr_base(void) { return "tyrian/"; }
+// settings and saves where it runs (file.c)
+const char *tyr_user_dir(void) { return 0; }
 int tyr_has_sound(void) { return snd_present(); }
 uint32_t plat_ms(void) { return __time(); }
 void plat_sleep(uint32_t ms) { if (ms) __c4_usleep(ms * 1000); }

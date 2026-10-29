@@ -14,6 +14,8 @@ int tyr_win_poll(int *ev) { (void) ev; return 0; }
 void tyr_win_close(void) {}
 // the data where it runs, or where -t says
 const char *tyr_base(void) { return "./"; }
+// settings and saves as OpenTyrian keeps them (file.c)
+const char *tyr_user_dir(void) { return 0; }
 int tyr_has_sound(void) { return 0; }
 uint32_t plat_ms(void) {
 	struct timeval tv;
