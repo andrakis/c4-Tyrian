@@ -3,8 +3,8 @@
 Tyrian (Eclipse Software, 1995), the vertical shooter, as OpenTyrian has
 it. It is compiled by c4lc and played on libjs's whole display, with its
 music on libjs's sound card AdLib and its sound effects on the card's
-sample channels. It is played from the keyboard; the mouse works in the
-menus.
+sample channels. It is played from the keyboard or the mouse, which steers
+once a click has locked it to the display, and works in the menus.
 
 The game's data is not here. Tyrian 2.1 is freeware, but its `license.doc`
 does not allow it to be passed on. `data/README.md` says where to put
@@ -19,9 +19,9 @@ port before it, and this one follows it.
 
 | where | how | platform |
 |---|---|---|
-| C4IX, the whole display | `tyrian`, or Go > Tyrian; the desktop gives way until it ends (`include/display.h`) | `video-c4.c`, `tyr-c4ix.c` |
+| C4IX, the whole display | `tyrian`, or Go > Games > Tyrian; the desktop gives way until it ends (`include/display.h`) | `video-c4.c`, `tyr-c4ix.c` |
 | C4IX, a window | `tyrian --window` in a Terminal, whose window it plays in; also when a program that does not give way has the display. With `pin`, on a CPU of its own (docs/c4ix-smp.md) | `video-c4.c`, `tyr-c4ix.c` |
-| C4DOS | `TYRIAN` at the `A>` prompt; the page's `?system=c4dos` | `video-c4.c`, `tyr-bare.c` |
+| C4DOS | `TYRIAN` at the `A:\>` prompt; the page's `?system=c4dos` | `video-c4.c`, `tyr-bare.c` |
 | a grin window, under C4DOS | Program Manager's Games > Tyrian, or `TYRIAN.C4R` in File Manager or a DOS Prompt, in grin (`?system=c4dos` boots into it) | `video-c4.c`, `tyr-bare.c`, through grin's table (below) |
 | the bare machine | `tyrian.c4r` as the machine's image; the page's `?system=tyrian` | `video-c4.c`, `tyr-bare.c` |
 
@@ -49,7 +49,7 @@ runs grin's loop once, so grin's applications (a Clock, Notepad) carry on
 while the game plays; the window is 1x (320x200) or 2x (640x400), from its
 Size menu; keys reach the game only while its window has the focus; and
 closing the window ends the game, as quitting it would. Without grin -- at
-`A>`, full screen from grin, or on the bare machine -- nothing changes.
+`A:\>`, full screen from grin, or on the bare machine -- nothing changes.
 
 In grin's window the mouse steers too: a click on the window locks it to
 the display, as full screen, Esc lets it go, and its motion and buttons
