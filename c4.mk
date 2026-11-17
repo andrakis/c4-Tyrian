@@ -17,14 +17,14 @@ TYR_HDRS   := $(wildcard $(TYR)/*.h $(TYR)/c4/*.h) \
               $(wildcard src/c4ix/libc/include/*.h src/c4ix/libc/include/sys/*.h) \
               src/c4ix/include/display.h libjs/guest/gui.h libjs/guest/gui.c \
               libjs/guest/snd.h libjs/guest/snd.c
-TYR_CC     := ./c4sp32 -c 400000 src/c4sp/lisp/c4lc.lisp -O $(IMG_G) -mfuse -fno-builtin -c -conforming \
+TYR_CC     := $(call lc32,-c 400000) -O $(IMG_G) -mfuse -fno-builtin -c -conforming \
               -D C4TYR -I $(TYR)/c4 -I src/c4ix/libc/include -I src/c4ix/include \
               -I libjs/guest -I $(TYR)
 tyrian-objs: $(TYR_UNITS:%=.tyrian/%.c4o) .tyrian/plat/tyr-c4ix.c4o .tyrian/plat/tyr-bare.c4o
-.tyrian/%.c4o: $(TYR)/%.c $(TYR_HDRS) $(C4LC_LISP) .img_g | c4sp32
+.tyrian/%.c4o: $(TYR)/%.c $(TYR_HDRS) $(C4LC_LISP) .img_g | $(LC32_BIN)
 	@mkdir -p .tyrian/plat
 	$(TYR_CC) $< $@ > /dev/null
-.tyrian/plat/%.c4o: $(TYR)/%.c $(TYR_HDRS) $(C4LC_LISP) .img_g | c4sp32
+.tyrian/plat/%.c4o: $(TYR)/%.c $(TYR_HDRS) $(C4LC_LISP) .img_g | $(LC32_BIN)
 	@mkdir -p .tyrian/plat
 	$(TYR_CC) $< $@ > /dev/null
 PHONY += tyrian-objs
