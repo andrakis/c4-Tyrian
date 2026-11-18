@@ -16,6 +16,17 @@
 #include <string.h>
 #include "SDL.h"
 #include "palette.h"
+#include "c4accel.h"   // c4: the browser's accelerators
+
+// Its accelerators (c4/accel.mjs, c4/c4accel.h). tyr_accel is the first of
+// the game's numbers, or 0: the game's to draw them. -1 until asked, which
+// the first blit does; the config (config.c) and Setup > Graphics'
+// Accelerated (opentyr.c) set it.
+int tyr_accel = -1;
+int tyr_accel_on = 1;
+int tyr_accel_base(void) { return tyr_accel = tyr_accel_on ? accel_find("tyrian") : 0; }
+int tyr_accel_avail(void) { return accel_find("tyrian") != 0; }
+void tyr_accel_set(int on) { tyr_accel_on = on != 0; tyr_accel = tyr_accel_on ? accel_find("tyrian") : 0; }
 
 Uint32 plat_ms(void);           // tyr-c4ix.c, tyr-bare.c, tyr-host.c
 void   plat_sleep(Uint32 ms);
@@ -113,11 +124,17 @@ void tyr_frame(SDL_Surface *s) {
 	if (!timing) return;
 	if (!frames) t0 = plat_ms();
 	h = sum;
-	for (i = 0; i < 256; i++) h = h * 31 + rgb_palette[i];
-	for (y = 0; y < s->h; y++) {
-		p = (Uint8 *) s->pixels + y * s->pitch;
-		for (i = 0; i < s->w; i += 4)
-			h = h * 31 + (Uint32) (p[i] | (p[i + 1] << 8) | (p[i + 2] << 16) | ((Uint32) p[i + 3] << 24));
+	// in one instruction where the machine has the game's accelerators
+	// (c4/c4accel.h), the same sum
+	if (TYR_ACCEL())
+		h = (Uint32) tyr_sum(h, rgb_palette, s->pixels, s->w, s->h, s->pitch);
+	else {
+		for (i = 0; i < 256; i++) h = h * 31 + rgb_palette[i];
+		for (y = 0; y < s->h; y++) {
+			p = (Uint8 *) s->pixels + y * s->pitch;
+			for (i = 0; i < s->w; i += 4)
+				h = h * 31 + (Uint32) (p[i] | (p[i + 1] << 8) | (p[i + 2] << 16) | ((Uint32) p[i + 3] << 24));
+		}
 	}
 	sum = h;
 	frames++;

@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "opentyr.h"
+#include "c4accel.h"   // c4: the browser's accelerators
 
 #include "config.h"
 #include "demo.h"
@@ -112,6 +113,7 @@ void setupMenu(void)
 		MENU_ITEM_DISPLAY,
 		MENU_ITEM_SCALER,
 		MENU_ITEM_SCALING_MODE,
+		MENU_ITEM_ACCELERATED,  // c4: the browser's accelerators
 		MENU_ITEM_MUSIC_VOLUME,
 		MENU_ITEM_SOUND_VOLUME,
 	} MenuItemId;
@@ -157,6 +159,7 @@ void setupMenu(void)
 				{ MENU_ITEM_DISPLAY, "Display:", "Change the display mode.", getDisplayPickerItemsCount, getDisplayPickerItem },
 				{ MENU_ITEM_SCALER, "Scaler:", "Change the pixel art scaling algorithm.", getScalerPickerItemsCount, getScalerPickerItem },
 				{ MENU_ITEM_SCALING_MODE, "Scaling Mode:", "Change the scaling mode.", getScalingModePickerItemsCount, getScalingModePickerItem },
+				{ MENU_ITEM_ACCELERATED, "Accelerated:", "Draw with the browser's accelerators, where there are." },
 				{ MENU_ITEM_DONE, "Done", "Return to the previous menu." },
 				{ -1 }
 			},
@@ -263,6 +266,11 @@ void setupMenu(void)
 
 			case MENU_ITEM_SCALING_MODE:
 				drawFontHvShadow(VGAScreen, xMenuItemValue, y, scaling_mode_names[scaling_mode], FONT_NORMAL, 15, -3 + (selected ? 2 : 0) + (disabled ? -4 : 0), false, 2);
+				break;
+
+			case MENU_ITEM_ACCELERATED:  // c4: on, off, or none on this machine
+				drawFontHvShadow(VGAScreen, xMenuItemValue, y, !tyr_accel_avail() ? "None here" : tyr_accel_on ? "On" : "Off",
+				                 FONT_NORMAL, 15, -3 + (selected ? 2 : 0) + (disabled ? -4 : 0), false, 2);
 				break;
 
 			case MENU_ITEM_MUSIC_VOLUME:
@@ -382,6 +390,7 @@ void setupMenu(void)
 									case MENU_ITEM_DISPLAY:
 									case MENU_ITEM_SCALER:
 									case MENU_ITEM_SCALING_MODE:
+									case MENU_ITEM_ACCELERATED:
 									{
 										action = true;
 										break;
@@ -569,6 +578,15 @@ void setupMenu(void)
 
 					currentPicker = selectedMenuItemId;
 					pickerSelectedIndex = (size_t)(fullscreen_display + 1);
+					break;
+				}
+				case MENU_ITEM_ACCELERATED:
+				{
+					// c4: the browser's accelerators on or off, where there are
+					JE_playSampleNum(S_CLICK);
+
+					if (tyr_accel_avail())
+						tyr_accel_set(!tyr_accel_on);
 					break;
 				}
 				case MENU_ITEM_SCALER:

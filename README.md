@@ -79,6 +79,8 @@ come to `c4sdl.c` in the display's 640x480, as they do full screen.
 | `tyr-c4ix.c`, `tyr-bare.c` | whether the display has to be asked for (on C4IX the desktop has it, under grin grin does), the window instead (C4IX's, or grin's), and where the data is |
 | `tyr-host.c` | the platform on a host, built with gcc: no display and no sound, the reference for `make test-tyrian` |
 | `c4/` | `SDL.h` and friends, and the `stdint.h`, `stdbool.h` and `inttypes.h` C4IX's libc lacks |
+| `c4/accel.mjs`, `c4/c4accel.h` | the browser's accelerators: the sprites' blits, the background's rows, the screen's filters and the timedemo's checksum in the game's own JavaScript, run by c4's libjs (docs/accel.md in c4) |
+| `c4/acceltest.c` | each accelerator against the loop it stands for; `make test-tyrian` runs it first |
 | `tools/tyrdata.py` | the data out of the zip, for `build-images.sh` |
 | `data/` | where the zip goes; ignored by git but for its README |
 
@@ -97,6 +99,16 @@ and the units it replaces are not built.
   operation on it is a helper call: the background blitters and the
   starfield took 94% of the time. With the change the game runs twelve
   times as fast. gcc `-m32` makes the same choice.
+- **The browser's accelerators** (`c4/accel.mjs`, docs/accel.md in c4).
+  Where the machine has them (c4's libjs: the page, `cli.js`), every
+  sprite blit of both kinds (`sprite.c`), the background's rows of tiles
+  and the screen's hue and brightness filters (`backgrnd.c`) and the
+  timedemo's checksum (`tyrian-sum.c`) are each one instruction, run by the
+  host with exactly the C's results: a timedemo's frame is a twentieth to
+  a fortieth of the instructions it was, with the same checksums. Setup >
+  Graphics has **Accelerated** (On, Off, or "None here"), `accelerated` in
+  `opentyrian.cfg`'s video section. Everywhere else, and in gcc's build,
+  the C draws as before.
 
 c4lc needed M12 for it ([docs/c4lc-design.md](../../docs/c4lc-design.md)
 14.11). That covers declarations in `for`, structs returned by value,

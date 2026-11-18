@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "sprite.h"
+#include "c4accel.h"   // c4: the browser's accelerators
 
 #include "file.h"
 #include "logging.h"
@@ -138,6 +139,16 @@ void blit_sprite(SDL_Surface *surface, int x, int y, unsigned int table, unsigne
 	const Uint8 * const pixels_ll = (Uint8 *)surface->pixels,  // lower limit
 	            * const pixels_ul = (Uint8 *)surface->pixels + (surface->h * surface->pitch);  // upper limit
 	
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite(data, cur_sprite->size, width, pixels, pixels_ll, pixels_ul, surface->pitch, TS_PLAIN, 0, 0);
+		return;
+	}
+#endif
+
 	for (; data < data_ul; ++data)
 	{
 		switch (*data)
@@ -197,6 +208,16 @@ void blit_sprite_blend(SDL_Surface *surface, int x, int y, unsigned int table, u
 	Uint8 *             pixels =    (Uint8 *)surface->pixels + (y * surface->pitch) + x;
 	const Uint8 * const pixels_ll = (Uint8 *)surface->pixels,  // lower limit
 	            * const pixels_ul = (Uint8 *)surface->pixels + (surface->h * surface->pitch);  // upper limit
+
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite(data, cur_sprite->size, width, pixels, pixels_ll, pixels_ul, surface->pitch, TS_BLEND, 0, 0);
+		return;
+	}
+#endif
 	
 	for (; data < data_ul; ++data)
 	{
@@ -262,6 +283,16 @@ void blit_sprite_hv_unsafe(SDL_Surface *surface, int x, int y, unsigned int tabl
 	const Uint8 * const pixels_ll = (Uint8 *)surface->pixels,  // lower limit
 	            * const pixels_ul = (Uint8 *)surface->pixels + (surface->h * surface->pitch);  // upper limit
 	
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite(data, cur_sprite->size, width, pixels, pixels_ll, pixels_ul, surface->pitch, TS_HV_UNSAFE, hue, value);
+		return;
+	}
+#endif
+
 	for (; data < data_ul; ++data)
 	{
 		switch (*data)
@@ -323,6 +354,16 @@ void blit_sprite_hv(SDL_Surface *surface, int x, int y, unsigned int table, unsi
 	Uint8 *             pixels =    (Uint8 *)surface->pixels + (y * surface->pitch) + x;
 	const Uint8 * const pixels_ll = (Uint8 *)surface->pixels,  // lower limit
 	            * const pixels_ul = (Uint8 *)surface->pixels + (surface->h * surface->pitch);  // upper limit
+
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite(data, cur_sprite->size, width, pixels, pixels_ll, pixels_ul, surface->pitch, TS_HV, hue, value);
+		return;
+	}
+#endif
 	
 	for (; data < data_ul; ++data)
 	{
@@ -392,6 +433,16 @@ void blit_sprite_hv_blend(SDL_Surface *surface, int x, int y, unsigned int table
 	const Uint8 * const pixels_ll = (Uint8 *)surface->pixels,  // lower limit
 	            * const pixels_ul = (Uint8 *)surface->pixels + (surface->h * surface->pitch);  // upper limit
 	
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite(data, cur_sprite->size, width, pixels, pixels_ll, pixels_ul, surface->pitch, TS_HV_BLEND, hue, value);
+		return;
+	}
+#endif
+
 	for (; data < data_ul; ++data)
 	{
 		switch (*data)
@@ -457,6 +508,16 @@ void blit_sprite_dark(SDL_Surface *surface, int x, int y, unsigned int table, un
 	Uint8 *             pixels =    (Uint8 *)surface->pixels + (y * surface->pitch) + x;
 	const Uint8 * const pixels_ll = (Uint8 *)surface->pixels,  // lower limit
 	            * const pixels_ul = (Uint8 *)surface->pixels + (surface->h * surface->pitch);  // upper limit
+
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite(data, cur_sprite->size, width, pixels, pixels_ll, pixels_ul, surface->pitch, TS_DARK, 0, black);
+		return;
+	}
+#endif
 	
 	for (; data < data_ul; ++data)
 	{
@@ -549,6 +610,16 @@ void blit_sprite2(SDL_Surface *surface, int x, int y, Sprite2_array sprite2s, un
 	
 	const Uint8 *data = sprite2s.data + SDL_SwapLE16(((Uint16 *)sprite2s.data)[index - 1]);
 	
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite2(data, pixels, pixels_ll, pixels_ul, VGAScreen->pitch, TS_2, 0);
+		return;
+	}
+#endif
+
 	for (; *data != 0x0f; ++data)
 	{
 		pixels += *data & 0x0f;                   // second nibble: transparent pixel count
@@ -580,6 +651,16 @@ void blit_sprite2_clip(SDL_Surface *surface, int x, int y, Sprite2_array sprite2
 	assert(surface->format->BitsPerPixel == 8);
 
 	const Uint8 *data = sprite2s.data + SDL_SwapLE16(((Uint16 *)sprite2s.data)[index - 1]);
+
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite2c(data, x, y, surface->pixels, surface->pitch, surface->h, TS_2, 0);
+		return;
+	}
+#endif
 
 	for (; *data != 0x0f; ++data)
 	{
@@ -626,6 +707,16 @@ void blit_sprite2_blend(SDL_Surface *surface,  int x, int y, Sprite2_array sprit
 	
 	const Uint8 *data = sprite2s.data + SDL_SwapLE16(((Uint16 *)sprite2s.data)[index - 1]);
 	
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite2(data, pixels, pixels_ll, pixels_ul, VGAScreen->pitch, TS_2_BLEND, 0);
+		return;
+	}
+#endif
+
 	for (; *data != 0x0f; ++data)
 	{
 		pixels += *data & 0x0f;                   // second nibble: transparent pixel count
@@ -661,6 +752,16 @@ void blit_sprite2_darken(SDL_Surface *surface, int x, int y, Sprite2_array sprit
 	            * const pixels_ul = (Uint8 *)surface->pixels + (surface->h * surface->pitch);  // upper limit
 	
 	const Uint8 *data = sprite2s.data + SDL_SwapLE16(((Uint16 *)sprite2s.data)[index - 1]);
+	
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite2(data, pixels, pixels_ll, pixels_ul, VGAScreen->pitch, TS_2_DARKEN, 0);
+		return;
+	}
+#endif
 	
 	for (; *data != 0x0f; ++data)
 	{
@@ -698,6 +799,16 @@ void blit_sprite2_filter(SDL_Surface *surface, int x, int y, Sprite2_array sprit
 	
 	const Uint8 *data = sprite2s.data + SDL_SwapLE16(((Uint16 *)sprite2s.data)[index - 1]);
 	
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite2(data, pixels, pixels_ll, pixels_ul, VGAScreen->pitch, TS_2_FILTER, filter);
+		return;
+	}
+#endif
+
 	for (; *data != 0x0f; ++data)
 	{
 		pixels += *data & 0x0f;                   // second nibble: transparent pixel count
@@ -729,6 +840,16 @@ void blit_sprite2_filter_clip(SDL_Surface *surface, int x, int y, Sprite2_array 
 	assert(surface->format->BitsPerPixel == 8);
 
 	const Uint8 *data = sprite2s.data + SDL_SwapLE16(((Uint16 *)sprite2s.data)[index - 1]);
+
+#ifdef C4TYR
+	// c4: the whole sprite in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_sprite2c(data, x, y, surface->pixels, surface->pitch, surface->h, TS_2_FILTER, filter);
+		return;
+	}
+#endif
 
 	for (; *data != 0x0f; ++data)
 	{

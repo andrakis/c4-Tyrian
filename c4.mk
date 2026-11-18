@@ -16,7 +16,7 @@ TYR_UNITS  := $(filter-out $(TYR_PLAT) $(TYR_SKIP),$(patsubst $(TYR)/%.c,%,$(wil
 TYR_HDRS   := $(wildcard $(TYR)/*.h $(TYR)/c4/*.h) \
               $(wildcard src/c4ix/libc/include/*.h src/c4ix/libc/include/sys/*.h) \
               src/c4ix/include/display.h libjs/guest/gui.h libjs/guest/gui.c \
-              libjs/guest/snd.h libjs/guest/snd.c
+              libjs/guest/snd.h libjs/guest/snd.c libjs/guest/accel.h
 TYR_CC     := $(call lc32,-c 400000) -O $(IMG_G) -mfuse -fno-builtin -c -conforming \
               -D C4TYR -I $(TYR)/c4 -I src/c4ix/libc/include -I src/c4ix/include \
               -I libjs/guest -I $(TYR)
@@ -40,6 +40,17 @@ tyrian-host: $(TYR_HOST_SRCS) $(TYR_HDRS)
 # Tyrian 2.1, data/tyrian21.zip or $TYRIAN_ZIP (data/README.md). test-tyrian is
 # skipped without it.
 
+# c4's port: OpenTyrian's accelerators (c4/accel.mjs) against their loops,
+# on the bare machine, with libjs's own (cli.js loads them, docs/accel.md).
+# In a directory of its own: c4-images.sh links .tyrian/*.c4o into the
+# game. The timedemo runs below have them, so their frames are the
+# accelerators'; the gcc build has none.
+.tyrian/test/acceltest.c4o: $(TYR)/c4/acceltest.c $(TYR_HDRS) $(C4LC_LISP) .img_g | $(LC32_BIN)
+	@mkdir -p .tyrian/test
+	$(TYR_CC) $< $@ > /dev/null
+.tyrian/test/acceltest.c4r: .tyrian/test/acceltest.c4o libc-bare-objs
+	./c4rlink32 $< .libc-bare/libc-*.c4o -o $@ > /dev/null
+
 # test-tyrian: OpenTyrian's demo 4 (--timedemo, tyrian-sum.c: every frame
 # shown and its palette, on a virtual clock), built by gcc and by c4lc --
 # on the bare machine, under C4DOS and inside C4IX -- must show the same
@@ -47,10 +58,13 @@ tyrian-host: $(TYR_HOST_SRCS) $(TYR_HDRS)
 # Only where Tyrian's data is (games/tyrian/data/README.md); skipped,
 # and saying so, where it is not.
 TYR_DEMO := 4
-test-tyrian: tyrian-host c4bb-images
+test-tyrian: tyrian-host c4bb-images .tyrian/test/acceltest.c4r
 	@if [ ! -f src/c4bb/images/games/tyrian/data/tyrian1.lvl ]; then \
 	   echo "test-tyrian: skipped, no Tyrian data (games/tyrian/data/README.md)"; exit 0; fi; \
 	 rm -rf .tyr_t && mkdir -p .tyr_t && \
+	 { timeout 600 node libjs/cli.js -m 64 .tyrian/test/acceltest.c4r > .tyr_t/accel.txt 2>&1; cat .tyr_t/accel.txt; } && \
+	 { grep -q "^accel: Tyrian's, [0-9]* cases, each as its loop has it" .tyr_t/accel.txt \
+	   || { echo "test-tyrian: the accelerators do not draw as their loops"; exit 1; }; } && \
 	 ./tyrian-host -t src/c4bb/images/games/tyrian/data --timedemo $(TYR_DEMO) -s -x -j 2>/dev/null \
 	   | grep '^timedemo' > .tyr_t/host.txt && cat .tyr_t/host.txt && \
 	 ( cd src/c4bb/images/games && { timeout 2400 node ../../../../libjs/cli.js -m 64 -d . tyrian.c4r --timedemo $(TYR_DEMO) -s -x -j \

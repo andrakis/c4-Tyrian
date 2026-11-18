@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "config.h"
+#include "c4accel.h"   // c4: the browser's accelerators
 
 #include "episodes.h"
 #include "file.h"
@@ -289,6 +290,10 @@ static void loadOpenTyrianConfig(void)
 		const char *scaling_mode;
 		if (config_get_string_option(section, "scaling_mode", &scaling_mode))
 			set_scaling_mode_by_name(scaling_mode);
+
+		// c4: Setup > Graphics' Accelerated, on unless it says 0
+		config_get_int_option(section, "accelerated", &tyr_accel_on);
+		tyr_accel = -1;
 	}
 
 	section = config_find_section(config, "keyboard", NULL);
@@ -322,6 +327,8 @@ static void saveOpenTyrianConfig(void)
 	config_set_string_option(section, "scaler", scalers[scaler].name);
 	
 	config_set_string_option(section, "scaling_mode", scaling_mode_names[scaling_mode]);
+
+	config_set_int_option(section, "accelerated", tyr_accel_on);  // c4: Accelerated
 
 	section = config_find_or_add_section(config, "keyboard", NULL);
 	if (section == NULL)

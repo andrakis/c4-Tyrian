@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "backgrnd.h"
+#include "c4accel.h"   // c4: the browser's accelerators
 
 #include "config.h"
 #include "mtrand.h"
@@ -70,6 +71,16 @@ static void blitBackground1Row(SDL_Surface *dst, int_fast16_t x, int_fast16_t y,
 	assert(x >= 0 && x < 24);
 	assert(y >= -28 && y < vga_height);
 
+#ifdef C4TYR
+	// c4: the whole row in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_bgrow(dst->pixels, dst->pitch, x, y, map, TB_OPAQUE);
+		return;
+	}
+#endif
+
 	Uint8 *dst_pixels = dst->pixels;
 	int dst_pitch = dst->pitch;
 
@@ -117,6 +128,16 @@ static void blitBackgroundRow(SDL_Surface *dst, int_fast16_t x, int_fast16_t y, 
 {
 	assert(x >= 0 && x < 24);
 	assert(y >= -28 && y < vga_height);
+
+#ifdef C4TYR
+	// c4: the whole row in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_bgrow(dst->pixels, dst->pitch, x, y, map, TB_CLEAR);
+		return;
+	}
+#endif
 
 	Uint8 *dst_pixels = dst->pixels;
 	int dst_pitch = dst->pitch;
@@ -197,6 +218,16 @@ static void blitBackgroundRowBlend(SDL_Surface *dst, int_fast16_t x, int_fast16_
 {
 	assert(x >= 0 && x < 24);
 	assert(y >= -28 && y < vga_height);
+
+#ifdef C4TYR
+	// c4: the whole row in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_bgrow(dst->pixels, dst->pitch, x, y, map, TB_BLEND);
+		return;
+	}
+#endif
 
 	Uint8 *dst_pixels = dst->pixels;
 	int dst_pitch = dst->pitch;
@@ -399,6 +430,16 @@ void draw_background_3(SDL_Surface *surface)
 
 static void filterScreenHue(SDL_Surface *screen, Uint8 hue)
 {
+#ifdef C4TYR
+	// c4: the play area in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_filter(screen->pixels, screen->pitch, 0, hue);
+		return;
+	}
+#endif
+
 	Uint8 *screen_pixels = screen->pixels;
 	int screen_pitch = screen->pitch;
 
@@ -426,6 +467,16 @@ static void filterScreenHue(SDL_Surface *screen, Uint8 hue)
 
 static void filterScreenValue(SDL_Surface *screen, Sint8 brightness)
 {
+#ifdef C4TYR
+	// c4: the play area in one instruction where the machine has the
+	// game's accelerators (c4/c4accel.h), the same pixels
+	if (TYR_ACCEL())
+	{
+		tyr_filter(screen->pixels, screen->pitch, 1, brightness);
+		return;
+	}
+#endif
+
 	Uint8 *screen_pixels = screen->pixels;
 	int screen_pitch = screen->pitch;
 
