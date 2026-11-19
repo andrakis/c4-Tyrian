@@ -27,7 +27,9 @@ void tyr_close_display(void) { udisplay_give(); }
 // started from (window.h), as wolf3d --window plays. Two buffers: the
 // desktop reads the one it was given when it next draws, and says so
 // (WIN_FRAME); until then a newer frame waits in the other, and only the
-// newest is sent. Keys come back in the display's own form, for c4sdl.c.
+// newest is sent. Keys and the mouse come back in the display's own form,
+// for c4sdl.c: the mouse's place in the canvas's 640x400 as the display's
+// 640x480, and its one button the left.
 static char *fbuf[2];
 static int *fpal[2];
 static int sent, waiting, pending, closed;
@@ -73,6 +75,12 @@ int tyr_win_poll(int *ev) {
 		if (k == WIN_KEY || k == WIN_KEYUP) {
 			ev[0] = k == WIN_KEY ? GUI_EV_KEYDOWN : GUI_EV_KEYUP;
 			ev[1] = w[0]; ev[2] = w[1]; ev[3] = w[2];
+			return 1;
+		}
+		if (k == WIN_MOVE || k == WIN_DOWN || k == WIN_UP) {
+			ev[0] = k == WIN_MOVE ? GUI_EV_MOVE : k == WIN_DOWN ? GUI_EV_DOWN : GUI_EV_UP;
+			ev[1] = w[0] * 640 / WIN_W; ev[2] = w[1] * 480 / WIN_H;
+			ev[3] = k == WIN_MOVE ? w[2] : 0;
 			return 1;
 		}
 	}

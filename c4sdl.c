@@ -233,10 +233,22 @@ int SDL_PushEvent(SDL_Event *ev) { push(ev); return 1; }
 void SDL_StartTextInput(void) { texting = 1; }
 void SDL_StopTextInput(void) { texting = 0; }
 
-// the display's events, as SDL's
+// the display's events, as SDL's. SDL's first is the focus a window has
+// when it opens: OpenTyrian steers by the mouse only while it has been
+// told it has the focus (keyboard.c, mouseGetRelativePosition), and the
+// display says so only when it changes. A window that has not got it
+// says so after this one (grin's, fwin.c), as it would under SDL.
+static int opened;
 static void gather(void) {
 	int ev[4], sc;
 	SDL_Event e;
+	if (!opened) {
+		opened = 1;
+		memset(&e, 0, sizeof e);
+		e.type = SDL_WINDOWEVENT;
+		e.window.event = SDL_WINDOWEVENT_FOCUS_GAINED;
+		push(&e);
+	}
 	while (tyr_poll(ev)) {
 		memset(&e, 0, sizeof e);
 		if (ev[0] == GUI_EV_KEYDOWN || ev[0] == GUI_EV_KEYUP) {

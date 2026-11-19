@@ -4,7 +4,8 @@ Tyrian (Eclipse Software, 1995), the vertical shooter, as OpenTyrian has
 it. It is compiled by c4lc and played on libjs's whole display, with its
 music on libjs's sound card AdLib and its sound effects on the card's
 sample channels. It is played from the keyboard or the mouse, which steers
-once a click has locked it to the display, and works in the menus.
+the ship and fires, once a click has locked it to the display, and works
+in the menus.
 
 The game's data is not here. Tyrian 2.1 is freeware, but its `license.doc`
 does not allow it to be passed on. `data/README.md` says where to put
@@ -54,6 +55,18 @@ closing the window ends the game, as quitting it would. Without grin -- at
 In grin's window the mouse steers too: a click on the window locks it to
 the display, as full screen, Esc lets it go, and its motion and buttons
 come to `c4sdl.c` in the display's 640x480, as they do full screen.
+
+In C4IX's window (`tyrian --window`) the mouse steers as it moves over
+the window, which does not lock it: `tyr-c4ix.c` gives `c4sdl.c` its
+place in the canvas's 640x400 as the display's 640x480, and its one
+button, the left, fires. The pointer stops at the window's edge, as
+SDL's does in a window that has not grabbed it.
+
+OpenTyrian steers by the mouse only while it has been told its window
+has the focus (`keyboard.c`), which SDL says when a window opens. The
+display says so only when the focus changes, so `c4sdl.c` gives the
+game that first event itself; without it the ship did not follow the
+mouse full screen, though the menus and the buttons worked.
 
 ## Where it comes from
 
