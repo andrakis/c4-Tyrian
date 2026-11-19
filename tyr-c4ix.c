@@ -29,7 +29,10 @@ void tyr_close_display(void) { udisplay_give(); }
 // (WIN_FRAME); until then a newer frame waits in the other, and only the
 // newest is sent. Keys and the mouse come back in the display's own form,
 // for c4sdl.c: the mouse's place in the canvas's 640x400 as the display's
-// 640x480, and its one button the left.
+// 640x480, and its buttons as they are. The game steers with the mouse, so
+// it asks for it locked to the window (win_lock): a click on the window
+// captures it, as the whole display's does, and its motion comes as
+// GUI_EV_REL, scaled the same way; Esc lets it go.
 static char *fbuf[2];
 static int *fpal[2];
 static int sent, waiting, pending, closed;
@@ -42,7 +45,9 @@ int tyr_win_open(void) {
 		fpal[i] = (int *) calloc(256, sizeof(int));
 		if (!fbuf[i] || !fpal[i]) return 0;
 	}
-	return win_open("Tyrian");
+	if (!win_open("Tyrian")) return 0;
+	win_lock(1);
+	return 1;
 }
 static void send_frame(int b) {
 	win_fb(fbuf[b], 320, 200, 320, fpal[b]);
@@ -80,8 +85,14 @@ int tyr_win_poll(int *ev) {
 		if (k == WIN_MOVE || k == WIN_DOWN || k == WIN_UP) {
 			ev[0] = k == WIN_MOVE ? GUI_EV_MOVE : k == WIN_DOWN ? GUI_EV_DOWN : GUI_EV_UP;
 			ev[1] = w[0] * 640 / WIN_W; ev[2] = w[1] * 480 / WIN_H;
-			ev[3] = k == WIN_MOVE ? w[2] : 0;
+			ev[3] = w[2];
 			return 1;
+		}
+		if (k == WIN_REL) {
+			ev[0] = GUI_EV_REL;
+			ev[1] = w[0] * 640 / WIN_W; ev[2] = w[1] * 480 / WIN_H;
+			ev[3] = w[2];
+			if (ev[1] || ev[2]) return 1;
 		}
 	}
 }
