@@ -103,6 +103,9 @@ void tyr_win_close(void) { if (!closed) { win_close(); closed = 1; } }
 // not in the directory it was started from (file.c)
 const char *tyr_base(void) { return "/usr/games/tyrian/"; }
 const char *tyr_user_dir(void) { return "/usr/games/tyrian"; }
+// --home: the person's own copy, which c4's page Uploads put in
+// /home/tyrian or /home (file.c, findDataFiles)
+const char *tyr_home_dir(int i) { return i == 0 ? "/home/tyrian" : i == 1 ? "/home" : 0; }
 int tyr_has_sound(void) { return snd_present(); }
 uint32_t plat_ms(void) { return __time(); }
 void plat_sleep(uint32_t ms) { if (ms) __c4_usleep(ms * 1000); }

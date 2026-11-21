@@ -60,6 +60,11 @@ void tyr_win_close(void) {}
 const char *tyr_base(void) { return "tyrian/"; }
 // settings and saves where it runs (file.c)
 const char *tyr_user_dir(void) { return 0; }
+// --home: the person's own copy, which c4's page Uploads put in tyrian/ or
+// at the top (file.c, findDataFiles): on the bare machine in the folder at
+// drive 0's root, then at the root; under C4DOS B:\TYRIAN, then B:\, the
+// home drive's, before the drive the game is on
+const char *tyr_home_dir(int i) { return i == 0 ? "tyrian" : i == 1 ? "" : 0; }
 int tyr_has_sound(void) { return snd_present(); }
 uint32_t plat_ms(void) { return __time(); }
 void plat_sleep(uint32_t ms) { if (ms) __c4_usleep(ms * 1000); }

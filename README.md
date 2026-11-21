@@ -96,6 +96,7 @@ mouse full screen, though the menus and the buttons worked.
 | `c4/accel.mjs`, `c4/c4accel.h` | the browser's accelerators: the sprites' blits, the background's rows, the screen's filters and the timedemo's checksum in the game's own JavaScript, run by c4's libjs (docs/accel.md in c4) |
 | `c4/acceltest.c` | each accelerator against the loop it stands for; `make test-tyrian` runs it first |
 | `tools/tyrdata.py` | the data out of the zip, for `build-images.sh` |
+| `file.c`, `params.c` (`C4TYR`) | `--home`: the person's own data, from c4's page Uploads, in each place `tyr_home_dir` gives (`/home/tyrian`, then `/home` on C4IX) |
 | `data/` | where the zip goes; ignored by git but for its README |
 
 ## The changes to OpenTyrian

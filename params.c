@@ -33,6 +33,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef C4TYR
+extern bool customDataHome;  // file.c: --home
+#endif
+
 JE_boolean richMode = false, constantPlay = false, constantDie = false;
 
 /* YKS: Note: LOOT cheat had non letters removed. */
@@ -51,6 +55,9 @@ void JE_paramCheck(int argc, char *argv[])
 		{ 'x', 'x', "no-xmas",           false },
 		
 		{ 't', 't', "data",              true },
+#ifdef C4TYR
+		{ 258, 0,   "home",              false }, // c4tyr: the person's own data (file.c)
+#endif
 		
 		{ 'n', 'n', "net",               true },
 		{ 256, 0,   "net-player-name",   true }, // TODO: no short codes because there should
@@ -94,6 +101,9 @@ void JE_paramCheck(int argc, char *argv[])
 			logInfo("  -j, --no-joystick            Disable joystick/gamepad input");
 			logInfo("  -x, --no-xmas                Disable Christmas mode");
 			logInfo("  -t, --data=DIR               Set Tyrian data directory");
+#ifdef C4TYR
+			logInfo("  --home                       Use your own Tyrian data (c4's Uploads: /home/tyrian)");
+#endif
 			logInfo("  -n, --net=HOST[:PORT]        Start a networked game");
 			logInfo("  --net-player-name=NAME       Set local player name in a networked game");
 			logInfo("  --net-player-number=NUMBER   Set local player number in a networked game");
@@ -121,6 +131,14 @@ void JE_paramCheck(int argc, char *argv[])
 		case 't':
 			customDataDirPath = option.arg;
 			break;
+#ifdef C4TYR
+		
+		// c4tyr: the person's own copy of the data, where c4's page
+		// Uploads put it (file.c, tyr_home_dir)
+		case 258:
+			customDataHome = true;
+			break;
+#endif
 			
 		case 'n':
 			isNetworkGame = true;

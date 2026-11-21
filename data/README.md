@@ -22,7 +22,17 @@ Those disks are never committed either (`src/c4bb/images/` is ignored).
 
 Without the zip everything still builds. Tyrian is linked as usual, but
 when started it says its data is missing, and `make test-tyrian` reports
-that it was skipped.
+that it was skipped. C4IX's Go > Games and grin's Action Games then leave
+plain Tyrian out.
+
+The page can also take the zip from whoever plays it: its Uploads take
+`tyrian21.zip` apart into `/home/tyrian` (c4's `libjs/uploads.js`), and
+`tyrian --home` reads the data there (`/home/tyrian`, then `/home`; under
+C4DOS `B:\TYRIAN`, then `B:\`; on the bare machine `tyrian/`, then the
+top). That is how c4's GitHub Pages site offers Tyrian: it carries the
+engine and none of the data (c4's `libjs/site.sh` refuses any of it).
+The zip is the one OpenTyrian's README points to,
+<https://camanis.net/tyrian/tyrian21.zip>.
 
 `make test-tyrian`'s checksums are for the zip this port was made with:
 `tyrian21.zip`, 4,754,048 bytes, holding a `tyrian21/` folder.

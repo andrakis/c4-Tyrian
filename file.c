@@ -36,6 +36,12 @@
 #endif
 
 const char *customDataDirPath = NULL;
+#ifdef C4TYR
+// c4tyr: --home (params.c), the person's own copy of the data rather than
+// one beside the game: looked for in each of the platform's places for it
+// in turn, tyr_home_dir(0), (1), ... (tyr-c4ix.c: /home/tyrian, /home)
+bool customDataHome = false;
+#endif
 
 enum
 {
@@ -77,6 +83,23 @@ bool findDataFiles(void)
 
 		return dataFileExists(filename);
 	}
+
+#ifdef C4TYR
+	if (customDataHome)
+	{
+		const char *tyr_home_dir(int i);
+		for (int i = 0; tyr_home_dir(i) != NULL; ++i)
+		{
+			dataDirPath = tyr_home_dir(i);
+			dataDirPathLen = strlen(dataDirPath);
+
+			if (dataFileExists(filename))
+				return true;
+		}
+
+		return false;
+	}
+#endif
 
 	// A "data" directory next to the executable (or inside the app bundle's
 	// Resources on macOS), so a self-contained distribution runs from any cwd.

@@ -16,6 +16,8 @@ void tyr_win_close(void) {}
 const char *tyr_base(void) { return "./"; }
 // settings and saves as OpenTyrian keeps them (file.c)
 const char *tyr_user_dir(void) { return 0; }
+// --home: no person's own copy here (file.c, findDataFiles)
+const char *tyr_home_dir(int i) { (void) i; return 0; }
 int tyr_has_sound(void) { return 0; }
 uint32_t plat_ms(void) {
 	struct timeval tv;
