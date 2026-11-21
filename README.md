@@ -23,7 +23,8 @@ port before it, and this one follows it.
 | C4IX, the whole display | `tyrian`, or Go > Games > Tyrian; the desktop gives way until it ends (`include/display.h`) | `video-c4.c`, `tyr-c4ix.c` |
 | C4IX, a window | `tyrian --window` in a Terminal, whose window it plays in; also when a program that does not give way has the display. With `pin`, on a CPU of its own (docs/c4ix-smp.md) | `video-c4.c`, `tyr-c4ix.c` |
 | C4DOS | `TYRIAN` at the `A:\>` prompt; the page's `?system=c4dos` | `video-c4.c`, `tyr-bare.c` |
-| a grin window, under C4DOS | Program Manager's Games > Tyrian, or `TYRIAN.C4R` in File Manager or a DOS Prompt, in grin (`?system=c4dos` boots into it) | `video-c4.c`, `tyr-bare.c`, through grin's table (below) |
+| grin, under C4DOS | Program Manager's Action Games > Tyrian, full screen; `TYRIAN` in File Manager or a DOS Prompt plays as that item says (`?system=c4dos` boots into grin) | `video-c4.c`, `tyr-bare.c` |
+| a grin window, under C4DOS | an item of Program Manager's whose Properties say "DOS program, in a window" | `video-c4.c`, `tyr-bare.c`, through grin's table (below) |
 | the bare machine | `tyrian.c4r` as the machine's image; the page's `?system=tyrian` | `video-c4.c`, `tyr-bare.c` |
 
 On C4IX the game asks for a nice of -5 (docs/c4ix-design.md 4.4), so it
@@ -56,11 +57,11 @@ In grin's window the mouse steers too: a click on the window locks it to
 the display, as full screen, Esc lets it go, and its motion and buttons
 come to `c4sdl.c` in the display's 640x480, as they do full screen.
 
-In C4IX's window (`tyrian --window`) the mouse steers as it moves over
-the window, which does not lock it: `tyr-c4ix.c` gives `c4sdl.c` its
-place in the canvas's 640x400 as the display's 640x480, and its one
-button, the left, fires. The pointer stops at the window's edge, as
-SDL's does in a window that has not grabbed it.
+In C4IX's window (`tyrian --window`) the mouse steers too. The game asks
+for it locked to the window (`win_lock`): a click on the window captures
+it, as the whole display's does, and Esc lets it go. Its motion comes as
+`GUI_EV_REL`, scaled from the canvas's 640x400 to the display's 640x480
+(`tyr-c4ix.c`), and its buttons come as they are.
 
 OpenTyrian steers by the mouse only while it has been told its window
 has the focus (`keyboard.c`), which SDL says when a window opens. The
